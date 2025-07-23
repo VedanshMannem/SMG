@@ -21,7 +21,7 @@ export default function StocksPage() {
 
   return user ? (
 
-    <div className="p-6 min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+    <div className="p-6 min-h-screen bg-gray-50 flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-white">
       <div className="flex flex-col items-center space-y-4">
         <input
           placeholder="Enter a stock symbol"

@@ -5,11 +5,22 @@ import { useState, useEffect } from 'react';
 import db from '@/firebase/firestore';
 import { collection, getDocs } from 'firebase/firestore';
 import { auth } from '@/firebase/clientApp';
+import { stockCache, PortfolioHolding, PortfolioSummary } from '../utils/stockCache';
+
+interface Stock {
+  id: string;
+  symbol: string;
+  price: number;
+  quantity?: number;
+  totalCost?: number;
+  purchaseDate?: any;
+  averagePrice?: number;
+}
 
 export default function ProfilePage() {
-  const [stocks, setStocks] = useState<any[]>([]);
+  const [stocks, setStocks] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(true);
-  const [totalValue, setTotalValue] = useState(0);
+  const [portfolioSummary, setPortfolioSummary] = useState<PortfolioSummary | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
 
   const user = auth.currentUser;
@@ -35,12 +46,31 @@ export default function ProfilePage() {
           const stocksSnapshot = await getDocs(stocksCollection);
           const stocksList = stocksSnapshot.docs.map(doc => ({
             id: doc.id,
+            symbol: doc.data().symbol || '',
+            price: doc.data().price || 0,
+            quantity: doc.data().quantity || 1,
+            totalCost: doc.data().totalCost || 0,
+            purchaseDate: doc.data().purchaseDate,
+            averagePrice: doc.data().averagePrice || doc.data().price || 0,
             ...doc.data()
-          }));
+          })) as Stock[];
+          
           setStocks(stocksList);
           
-          const total = stocksList.reduce((sum, stock) => sum + ((stock as any).totalCost || 0), 0);
-          setTotalValue(total);
+          // Convert stocks to PortfolioHolding objects for summary calculation
+          const holdings: PortfolioHolding[] = stocksList.map(stock => ({
+            symbol: stock.symbol,
+            quantity: stock.quantity || 1,
+            averagePrice: stock.averagePrice || stock.price || 0,
+            totalCost: stock.totalCost || (stock.price * (stock.quantity || 1)),
+            purchaseDate: stock.purchaseDate
+          }));
+          
+          // Calculate portfolio summary using the cache
+          const summary = await stockCache.calculatePortfolioSummary(holdings);
+          setPortfolioSummary(summary);
+          
+          
         } catch (error) {
           console.error("Error fetching stocks:", error);
         } finally {
@@ -55,7 +85,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-white">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
         <p className="mt-4 text-gray-600">Loading your portfolio...</p>
       </div>
@@ -63,14 +93,34 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="p-30 min-h-screen bg-gray-50">
+    <div className="p-30 min-h-screen bg-gray-50 bg-gradient-to-br from-blue-50 to-white">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4 text-gray-800">Your Portfolio</h1>
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-600 mb-2">Total Portfolio Value</h2>
-            <p className="text-3xl font-bold text-blue-600">${totalValue.toFixed(2)}</p>
-          </div>
+          
+          {portfolioSummary && (
+            <>
+              <div className="grid md:grid-cols-3 gap-4 mb-6">
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <h2 className="text-xl font-semibold text-gray-600 mb-2">Portfolio Value</h2>
+                  <p className="text-3xl font-bold text-blue-600">${portfolioSummary.totalValue.toFixed(2)}</p>
+                </div>
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <h2 className="text-xl font-semibold text-gray-600 mb-2">Total Gain/Loss</h2>
+                  <p className={`text-3xl font-bold ${portfolioSummary.totalGainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    ${portfolioSummary.totalGainLoss >= 0 ? '+' : ''}${portfolioSummary.totalGainLoss.toFixed(2)}
+                  </p>
+                  <p className={`text-sm ${portfolioSummary.totalGainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    ({portfolioSummary.totalGainLoss >= 0 ? '+' : ''}{portfolioSummary.totalGainLossPercent.toFixed(2)}%)
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <h2 className="text-xl font-semibold text-gray-600 mb-2">Total Investment</h2>
+                  <p className="text-3xl font-bold text-gray-700">${portfolioSummary.totalCost.toFixed(2)}</p>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="bg-white rounded-lg shadow-lg p-6">
