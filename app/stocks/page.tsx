@@ -2,11 +2,7 @@
 
 import React from "react";
 import StockCard from "./stockCard";
-import { useState, useEffect } from 'react';
-import db from '@/firebase/firestore';
-import { collection, getDocs } from 'firebase/firestore';
 import { auth } from '@/firebase/clientApp';
-
 
 export default function StocksPage() {
   const user = auth.currentUser;

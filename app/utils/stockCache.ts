@@ -38,7 +38,7 @@ interface HistoricalData {
 
 class StockCache {
   private cache: Map<string, StockData> = new Map();
-  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+  private readonly CACHE_DURATION = 5 * 60 * 1000; 
 
   async getStockData(symbol: string): Promise<StockData | null> {
     const cached = this.cache.get(symbol);
@@ -69,7 +69,6 @@ class StockCache {
           lastUpdated: Date.now()
         };
         
-        // Store in cache
         this.cache.set(symbol, stockData);
         return stockData;
       } else {
@@ -152,6 +151,5 @@ class StockCache {
   
 }
 
-// Export a singleton instance
 export const stockCache = new StockCache();
 export type { StockData, PortfolioHolding, PortfolioSummary};

@@ -32,16 +32,13 @@ export default function Navbar() {
   };
 
   return user ? (
-    // Left sidebar when logged in - back to original size w-64
     <div className="fixed top-0 left-0 h-full w-64 bg-white shadow-xl border-r border-gray-200 z-50">
       <div className="flex flex-col h-full">
-        {/* Header */}
         <div className="p-6 border-b border-gray-100">
           <h2 className="text-xl font-semibold text-gray-800">Stock Market Game</h2>
           <p className="text-sm text-gray-500 mt-1">Welcome, {user.displayName?.split(' ')[0]}</p>
         </div>
 
-        {/* Navigation Links */}
         <nav className="flex-1 p-4">
           <div className="space-y-2">
             <button 
@@ -87,7 +84,6 @@ export default function Navbar() {
           </div>
         </nav>
 
-        {/* Sign Out Button at Bottom */}
         <div className="p-4 border-t border-gray-100">
           <button 
             onClick={() => {

@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // TODO: set up the loading state thing
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
@@ -30,9 +30,9 @@ export default function RootLayout({
     return (
       <html lang="en">
         <body className={lexend.className}>
-          <div className="flex items-center justify-center min-h-screen">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-          </div>
+          <div className="spinner">
+            <div className="spinnerin"></div>
+        </div>
         </body>
       </html>
     );

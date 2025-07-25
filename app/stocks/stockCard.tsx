@@ -22,13 +22,11 @@ export default function StockCard({ symbol }: { symbol: string }) {
     if (!uid || !currentStock.symbol || amount <= 0) return;
     
     try {
-      // First, check if user already owns this stock
       const stocksCollection = collection(db, `users/${uid}/stocks`);
       const q = query(stocksCollection, where("symbol", "==", currentStock.symbol));
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
-        // Stock already exists, update the existing document
         const existingDoc = querySnapshot.docs[0];
         const existingData = existingDoc.data();
         
@@ -46,7 +44,6 @@ export default function StockCard({ symbol }: { symbol: string }) {
         
         console.log("Stock holding updated for:", currentStock.symbol);
       } else {
-        // First time buying this stock, create new document
         await addDoc(collection(db, `users/${uid}/stocks`), {
           symbol: currentStock.symbol,
           price: currentStock.price,
@@ -60,7 +57,7 @@ export default function StockCard({ symbol }: { symbol: string }) {
       }
       
       setBuyButton(true);
-      setAmount(0); // Reset amount after purchase
+      setAmount(0);
     } catch (error) {
       console.error("Error processing stock purchase: ", error);
     }

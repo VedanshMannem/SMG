@@ -1,12 +1,9 @@
-// app/page.tsx
 "use client";
 import { useEffect, useState } from "react";
 import { auth } from "@/firebase/clientApp";
 import { loginWithGoogle } from "@/firebase/firebaseAuth";
 import { useRouter } from "next/navigation";
 import React from "react";
-import db from '@/firebase/firestore';
-import { collection, getDocs } from 'firebase/firestore';
 
 export default function Home() {
   const [user, setUser] = useState<any>(null);
@@ -18,8 +15,6 @@ export default function Home() {
     });
     return unsubscribe;
   }, []);
-
-
 
   return user ? (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
@@ -54,7 +49,6 @@ export default function Home() {
         <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">Your Trading Dashboard</h2>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
-          {/* Quick Actions Card */}
           <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-200">
             <div className="flex items-center mb-4">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">

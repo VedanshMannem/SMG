@@ -57,7 +57,6 @@ export default function ProfilePage() {
           
           setStocks(stocksList);
           
-          // Convert stocks to PortfolioHolding objects for summary calculation
           const holdings: PortfolioHolding[] = stocksList.map(stock => ({
             symbol: stock.symbol,
             quantity: stock.quantity || 1,
@@ -66,7 +65,6 @@ export default function ProfilePage() {
             purchaseDate: stock.purchaseDate
           }));
           
-          // Calculate portfolio summary using the cache
           const summary = await stockCache.calculatePortfolioSummary(holdings);
           setPortfolioSummary(summary);
           
